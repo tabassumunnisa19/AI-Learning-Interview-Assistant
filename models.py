@@ -1,29 +1,15 @@
-import torch
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-def generate_response(model, tokenizer, prompt):
+_model = None
+_tokenizer = None
 
-    # Encode input (T5 supports max 512 input tokens)
-    inputs = tokenizer(
-        prompt,
-        return_tensors="pt",
-        truncation=True,
-        max_length=512
-    )
+def load_model():
+    global _model, _tokenizer
 
-    # Generate output (deterministic for structured JSON)
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=600,
-            num_beams=4,
-            do_sample=False,
-            early_stopping=True
-        )
+    if _model is None or _tokenizer is None:
+        model_name = "google/flan-t5-small"
 
-    # Decode output
-    decoded_output = tokenizer.decode(
-        outputs[0],
-        skip_special_tokens=True
-    )
+        _tokenizer = AutoTokenizer.from_pretrained(model_name)
+        _model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-    return decoded_output
+    return _model, _tokenizer
