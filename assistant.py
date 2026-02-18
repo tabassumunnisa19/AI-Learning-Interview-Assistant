@@ -1,21 +1,29 @@
 import torch
 
 def generate_response(model, tokenizer, prompt):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
 
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
-    inputs = {key: value.to(device) for key, value in inputs.items()}
+    # Encode input (T5 max input length is 512)
+    inputs = tokenizer(
+        prompt,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
+    )
 
+    # Generate output (deterministic for structured JSON)
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=800,
-            temperature=0.3,
-            do_sample=True,
-            pad_token_id=tokenizer.eos_token_id
+            max_new_tokens=600,
+            num_beams=4,          # improves structure
+            do_sample=False,      # IMPORTANT for JSON stability
+            early_stopping=True
         )
 
-    decoded_output = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    # Decode output
+    decoded_output = tokenizer.decode(
+        outputs[0],
+        skip_special_tokens=True
+    )
 
     return decoded_output
