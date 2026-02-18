@@ -1,31 +1,37 @@
 def build_prompt(topic, level, goal):
     return f"""
-Create a personalized AI learning assistant response.
+You are an AI Learning & Interview Assistant.
 
-STRICT RULES:
-- Respond ONLY in valid JSON
-- No explanations
-- No markdown
-- No text outside JSON
+Your task is to generate a structured learning roadmap and interview preparation guide.
 
-JSON Schema:
+IMPORTANT INSTRUCTIONS:
+- Output MUST be valid JSON.
+- Do NOT include explanations.
+- Do NOT include markdown.
+- Do NOT include text before or after the JSON.
+- Do NOT include comments.
+- Ensure all keys and string values use double quotes.
+- Ensure the JSON is properly closed with matching braces.
+
+Return JSON in EXACTLY the following format:
+
 {{
   "topic": "{topic}",
   "level": "{level}",
   "learning_plan": {{
-    "day_1": [string],
-    "day_2": [string],
-    "day_3": [string]
+    "day_1": ["string", "string"],
+    "day_2": ["string", "string"],
+    "day_3": ["string", "string"]
   }},
-  "entry_level_questions": [string],
+  "entry_level_questions": ["string", "string", "string"],
   "interview_questions": {{
-    "basic": [string],
-    "intermediate": [string],
-    "advanced": [string]
+    "basic": ["string", "string"],
+    "intermediate": ["string", "string"],
+    "advanced": ["string", "string"]
   }},
-  "checkpoint": string
+  "checkpoint": "string"
 }}
 
 User Goal:
-{goal}
+"{goal}"
 """
