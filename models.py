@@ -1,16 +1,25 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
-_model = None
-_tokenizer = None
+def generate_response(model, tokenizer, prompt):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
 
-def load_model():
-    global _model, _tokenizer
+    inputs = tokenizer(
+        prompt,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
+    ).to(device)
 
-    if _model is None or _tokenizer is None:
-        model_name = "google/flan-t5-small"
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=600,
+            do_sample=False,        # IMPORTANT for T5
+            num_beams=4,            # better structured output
+            early_stopping=True
+        )
 
-        _tokenizer = AutoTokenizer.from_pretrained(model_name)
-        _model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    decoded_output = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    return _model, _tokenizer
+    return decoded_output
