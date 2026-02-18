@@ -1,20 +1,46 @@
 import streamlit as st
+from PIL import Image
 
 from models import load_model
 from prompt import build_prompt
 from assistant import generate_response
 from evaluator import extract_json
 
-st.set_page_config(page_title="AI Learning Assistant", layout="wide")
+# ----------------------------------------------------
+# Page Configuration
+# ----------------------------------------------------
+st.set_page_config(
+    page_title="AI Learning Assistant",
+    layout="wide"
+)
 
+# ----------------------------------------------------
+# Cover Image Section
+# ----------------------------------------------------
+image = Image.open("image.png")
+st.image(image, use_container_width=True)
+
+# Optional spacing
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ----------------------------------------------------
+# Title Section
+# ----------------------------------------------------
 st.title("🎓 AI Learning & Interview Assistant")
+st.markdown("Empowering personalized learning and intelligent interview preparation using Generative AI.")
 
+# ----------------------------------------------------
+# User Inputs
+# ----------------------------------------------------
 topic = st.text_input("Enter topic", "Python for Data Analysis")
 level = st.selectbox("Your level", ["Beginner", "Intermediate", "Advanced"])
 goal = st.text_area("Your goal", "Prepare for data analyst interviews")
 
+# ----------------------------------------------------
+# Generate Button
+# ----------------------------------------------------
 if st.button("Generate Learning Plan"):
-    with st.spinner("Thinking..."):
+    with st.spinner("Thinking... Generating your personalized roadmap..."):
         model, tokenizer = load_model()
         prompt = build_prompt(topic, level, goal)
         raw_output = generate_response(model, tokenizer, prompt)
