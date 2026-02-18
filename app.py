@@ -17,7 +17,7 @@ st.set_page_config(
 # ----------------------------------------------------
 # Cover Image Section
 # ----------------------------------------------------
-image = Image.open("image.png")
+image = Image.open("Image.png")
 st.image(image, use_container_width=True)
 
 # Optional spacing
