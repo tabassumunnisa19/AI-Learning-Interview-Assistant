@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from PIL import Image
 
 from models import load_model
@@ -17,20 +18,20 @@ st.set_page_config(
 # ----------------------------------------------------
 # Cover Image Section
 # ----------------------------------------------------
-import os
-from PIL import Image
-
 image_path = os.path.join(os.path.dirname(__file__), "Image.png")
-image = Image.open(image_path)
 
-# Resize image to reduce vertical height
-width, height = image.size
-new_height = int(height * 0.5)  # reduce to 50% height
-resized_image = image.resize((width, new_height))
+if os.path.exists(image_path):
+    image = Image.open(image_path)
 
-st.image(resized_image, use_container_width=True)
+    # Resize image to reduce vertical height
+    width, height = image.size
+    new_height = int(height * 0.5)
+    resized_image = image.resize((width, new_height))
 
-# Optional spacing
+    st.image(resized_image, use_container_width=True)
+else:
+    st.warning("Cover image not found.")
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
@@ -51,13 +52,28 @@ goal = st.text_area("Your goal", "Prepare for data analyst interviews")
 # ----------------------------------------------------
 if st.button("Generate Learning Plan"):
     with st.spinner("Thinking... Generating your personalized roadmap..."):
-        model, tokenizer = load_model()
-        prompt = build_prompt(topic, level, goal)
-        raw_output = generate_response(model, tokenizer, prompt)
-        data = extract_json(raw_output)
+
+        try:
+            model, tokenizer = load_model()
+            prompt = build_prompt(topic, level, goal)
+            raw_output = generate_response(model, tokenizer, prompt)
+
+            # DEBUG: Show raw model output
+            st.subheader("🔍 Raw Model Output (Debug)")
+            st.code(raw_output)
+
+            data = extract_json(raw_output)
+
+        except Exception as e:
+            st.error("❌ Error occurred while generating response.")
+            st.error(str(e))
+            st.stop()
 
     st.success("Generated successfully!")
 
+    # ----------------------------------------------------
+    # Display Results
+    # ----------------------------------------------------
     st.subheader("📘 Learning Plan")
     st.json(data["learning_plan"])
 
