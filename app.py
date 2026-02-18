@@ -17,8 +17,18 @@ st.set_page_config(
 # ----------------------------------------------------
 # Cover Image Section
 # ----------------------------------------------------
-image = Image.open("Image.png")
-st.image(image, use_container_width=True)
+import os
+from PIL import Image
+
+image_path = os.path.join(os.path.dirname(__file__), "Image.png")
+image = Image.open(image_path)
+
+# Resize image to reduce vertical height
+width, height = image.size
+new_height = int(height * 0.5)  # reduce to 50% height
+resized_image = image.resize((width, new_height))
+
+st.image(resized_image, use_container_width=True)
 
 # Optional spacing
 st.markdown("<br>", unsafe_allow_html=True)
